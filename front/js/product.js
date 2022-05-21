@@ -1,23 +1,28 @@
-
-
+//mon fetch du produit cliqué sur la home
 (async () => {
-  //faire en sorte que l'adresse du serveur puisse être modifié automatiquement
-      getOneProduct().then(products => {
-        displayProducts(products);
-      });
+    //faire en sorte que l'adresse du serveur puisse être modifié automatiquement
+    try {
+        getOneProduct().then(products => {
+            displayProducts(products);
+        });
+    } catch {
+        console.log("le fetch du product ne marche pas")
+    }
 })();
 
+////////////////////////////
+// Afficher le produits
+
+//j'établis mes constantes
 const button = document.querySelector("button");
 const result = document.querySelector(".item");
 
-
-// Afficher le produits
-
+//je crée ma fonction
 function displayProducts(product) {
-  console.log("products called");
-  if(product) {
-    result.innerHTML =
-          `<article>
+    console.log("products called");
+    if (product) {
+        result.innerHTML =
+            `<article>
             <div class="item__img">
               <img src="${product.imageUrl}" alt="${product.altTxt}">
             </div>
@@ -45,119 +50,94 @@ function displayProducts(product) {
 
                 <div class="item__content__settings__quantity">
                   <label for="itemQuantity">Nombre d'article(s) (1-100) :</label>
-                  <input type="number" name="itemQuantity" min="1" max="100" value="0" id="quantity">
+                  <input id="quantity" type="number" name="itemQuantity" min="1" max="100" value="1">
                 </div>
               </div>
 
               <div class="item__content__addButton">
-                <button id="addToCart">Ajouter au panier</button>
+                <button id="addToCart" onclick="createBasket()">Ajouter au panier</button>
               </div>
 
             </div>
           </article>
         `
 
-  } else {
-    console.error("products not found")
-  }
-
-  const containerButton = document.getElementById("addToCart");
-  console.log(containerButton)
-  containerButton.addEventListener("click", createBasket);
+    } else {
+        console.error("products not found")
+    }
 }
 
 ///////////
 
-//LE PANIER
+//LE PANIER --> Basket
+//je dois créer un local storage ou seront rangé les products choisis par l'utilisateur
 
 // Création du localStorage
 async function createBasket() {
-  const inputQuantity = document.querySelector("#quantity");
-  const product = await getOneProduct();
-  console.log("createBasket", product)
-  const select = document.querySelector("select");
-  const basket = {
-    id: product._id,
-    quantity: parseInt(inputQuantity.value),
-    color: select.value,
-    name: product.name,
-    imageUrl: product.imageUrl,
-  };
-  saveBasket(basket);
+    const inputQuantity = document.querySelector("#quantity");
+    const product = await getOneProduct();
+    console.log("createBasket", product)
+    const selectedColor = document.querySelector("select");
+
+    let basket = getBasket();
+    //Je définis la variable foundProduct, qui est un produit dans basket dont l'id
+    // ET la couleur est égal au produit demandé
+    //cela sert à ne pas ajouter 2 fois la même requête (cela s'appelle un prédicat)
+    //pour la couleur, c'est compliqué car il faut comparer des strings (et non des nombres),
+    // la méthode localeCompare permet de dire si A=B égal 0 équivault à A=B ou si A=B=1 équivaut à A!=B
+    let foundProduct = basket.find(p => p.id.localeCompare(product._id) === 0 && p.color.localeCompare(selectedColor.value) === 0);
+    console.log(basket, foundProduct);
+    //si c'est l'inverse de foundProduct
+    if (!foundProduct) {
+        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier
+        basket.push({
+            id: product._id,
+            //parseInt, comme le parseFloat, transforme un string en nombre entier
+            quantity: parseInt(inputQuantity.value),
+            description: product.description,
+            color: selectedColor.value,
+            name: product.name,
+            imageUrl: product.imageUrl,
+            price: product.price * parseInt(inputQuantity.value),
+        });
+        console.log("condition 1 : ok")
+    } else {
+        //condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
+        foundProduct.quantity += parseInt(inputQuantity.value);
+        foundProduct.price = product.price * foundProduct.quantity;
+        console.log("condition 2: ok")
+    }
+    try {
+        saveBasket(basket);
+        console.log("basket is saved in LS")
+    } catch (error) {
+        console.log("basket is not saved in LS")
+    }
+
 }
 
 //met des données dans le localstorage avec la clé basket
 function saveBasket(basket) {
-  console.log("createBasket")
-  localStorage.setItem("basket", JSON.stringify(basket));
+    console.log("createBasket");
+    localStorage.setItem("basket", JSON.stringify(basket));
 }
 
-function getBasket(){
-  //je crée une variable appelé 'basket' avec le contenu du localstorage à la clé 'basket'
-  let basket = localStorage.getItem("basket");
-  //on vérifie que l'on a récupérer quelque chose, si non, on fait un tableau vide, sinon, on créer un panier
-  if (basket === null) {
-    return [];
-  } else {
-    return JSON.parse(basket);
-  }
-}
-
-// ajouter un produit au panier
-
-function addBasket(product) {
-  let basket = getBasket();
-  let foundProduct = basket.find(p => p.id === product.id);
-  if (foundProduct !== undefined) {
-    foundProduct.quantity ++;
-  } else {
-    product.quantity = 1;
-    basket.push(product);
-  }
-  saveBasket(basket);
-}
-
-//Pour plus tard
-//retirer un produit du panier
-
-function removeFromBasket(product) {
-  let basket = getBasket();
-  // a changer
-  basket = basket.filter(p => p.id !== product.id);
-  saveBasket(basket);
-}
-
-//changer la quantité du panier
-function changeQuantity(product, quantity) {
-  let basket = getBasket();
-  let foundProduct = basket.find (p => p.id === product.id);
-  if (foundProduct !== undefined) {
-    foundProduct.quantity += quantity;
-    if(foundProduct.quantity <=0) {
-      removeFromBasket(foundProduct);
+//permet de récupérer les choix de mon utilisateur
+function getBasket() {
+    //je crée une variable appelé 'basket' avec le contenu du localstorage à la clé 'basket'
+    let basket = localStorage.getItem("basket");
+    //on vérifie que l'on a récupéré quelque chose, si non, on fait un tableau vide,
+    //c'est important, car cela permet de créer un tableau à remplir
+    if (!basket || basket === "undefined") {
+        return [];
     } else {
-      saveBasket(basket);
+        // sinon, on créer un panier
+        return JSON.parse(basket);
     }
-  }
-
 }
 
-// calculer la quantité
-function getNumberProduct(){
-  let basket = getBasket();
-  let number = 0;
-  for(let product of basket) {
-    number += product.quantity;
-  }
-  return number;
-}
 
-function getTotalPrice() {
-  let basket = getBasket();
-  let total = 0;
-  for (let product of basket) {
-    total += product.quantity * product.price;
-  }
-  return total;
-}
+
+
+
 

@@ -3,7 +3,7 @@
 // Récupérer l'id dans l'URL
 const productId = new URL(location.href).searchParams.get("id");
 
-// Récupérer un produit de l'API avec l'id
+// Récupérer un productInBasket de l'API avec l'id
 async function getOneProduct() {
     let config = await loadConfig();
     if (productId) {
