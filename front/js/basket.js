@@ -1,12 +1,13 @@
-
 //Je récupère les données de mon localStorage
-try{
+try {
     const basketContent = getBasket();
     console.log(basketContent)
     basketContent.forEach(p => displayBasket(p))
-}catch (error){
+} catch (error) {
     console.log("basket is not load from LS", error)
 }
+
+displayTotalPrice();
 
 //remet des données dans le localstorage avec la clé basket
 function saveBasket(basket) {
@@ -55,7 +56,7 @@ function displayBasket(basket) {
 //sur ce fichier, la fonction getBasket n'existe pas et si j'exécute product.js,
 //le fetch oneProduct est vide et crée une erreur, je dois donc le reproduire
 
-function getBasket(){
+function getBasket() {
     //je crée une variable appelé 'basket' avec le contenu du localstorage à la clé 'basket'
     let basket = localStorage.getItem("basket");
     //on vérifie que l'on a récupérer quelque chose, si non, on fait un tableau vide, sinon, on créer un panier
@@ -82,7 +83,7 @@ function removeFromBasket(id, color) {
 //changer la quantité du panier
 function changeQuantity(product, quantity) {
     let basket = getBasket();
-    let foundProduct = basket.find(p => p.id === product.id);
+    let foundProduct = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
     if (foundProduct !== undefined) {
         foundProduct.quantity += quantity;
         if (foundProduct.quantity <= 0) {
@@ -98,8 +99,8 @@ function changeQuantity(product, quantity) {
 function getNumberProduct() {
     let basket = getBasket();
     let number = 0;
-    for (let product of basket) {
-        number += product.quantity;
+    for (let basketElement of basket) {
+        number += basketElement.quantity;
     }
     return number;
 }
@@ -107,11 +108,22 @@ function getNumberProduct() {
 function getTotalPrice() {
     let basket = getBasket();
     let total = 0;
-    for (let product of basket) {
-        total += product.quantity * product.price;
+    for (let basketElement of basket) {
+        total += basketElement.quantity * basketElement.price;
     }
     console.log("total")
     return total;
+}
+
+function displayTotalPrice() {
+    const result = document.querySelector(".cart__price");
+    result.innerHTML +=
+        `<p>Total (
+            <span id="totalQuantity">${getNumberProduct()}
+            </span> articles) : 
+            <span id="totalPrice">${getTotalPrice()}</span> €
+            </p> 
+        `
 }
 
 //Autre méthode
