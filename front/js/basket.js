@@ -38,7 +38,7 @@ function displayBasket(basket) {
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket.quantity}">
+                      <input onblur="editQuantityBasket(value, '${basket.id}', '${basket.color}')" onkeydown="onEnter(event.key, value, '${basket.id}', '${basket.color}')" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket.quantity}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <button onclick="removeFromBasket('${basket.id}', '${basket.color}')">Supprimer</button>
@@ -79,21 +79,38 @@ function removeFromBasket(id, color) {
     document.location.reload();
 }
 
-
-//changer la quantité du panier
-function changeQuantity(product, quantity) {
+// appeler avec le onblur
+// (dès que l'on clique ailleurs après avoir modifier le value, à la déselection)
+function editQuantityBasket(newQuantity, id, color) {
     let basket = getBasket();
     let foundProduct = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
-    if (foundProduct !== undefined) {
-        foundProduct.quantity += quantity;
-        if (foundProduct.quantity <= 0) {
-            removeFromBasket(foundProduct);
-        } else {
-            saveBasket(basket);
-        }
+    if (newQuantity !== null) {
+        //condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
+        foundProduct.quantity = newQuantity;
+        console.log("nouvelle quantité", foundProduct)
+        foundProduct.price = foundProduct.price * foundProduct.quantity;
+        console.log("nouveau prix", foundProduct);
+    } else {
+        //condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
+        foundProduct.quantity = 0;
+        console.log("quantité 0", foundProduct)
+        foundProduct.price = 0;
+        console.log("prix 0", foundProduct);
     }
+    saveBasket(basket);
+    document.location.reload();
 
 }
+
+// selectionner avec le enter, il n'y a pas d'évenement spécifique pour ça
+// on en crée un sur l'element enter
+function onEnter(key, newQuantity, id, color) {
+    // il ne se passe rien tant que le key n'est pas ce que je veux
+    if (key === "Enter") {
+        editQuantityBasket(newQuantity, id, color)
+    }
+}
+
 
 // calculer la quantité
 function getNumberProduct() {
@@ -125,41 +142,5 @@ function displayTotalPrice() {
             </p> 
         `
 }
-
-//Autre méthode
-///////////////////////
-//Tenir compte des instruction de la page product :
-////////
-// //je crée ma fonction de comptabilité à mon panier
-// //je déclare des variables d'addition, de soustraction, et d'affichage du compte
-// const counterDisplayElement = document.querySelector("#countDisplay");
-// const counterMinusElement = document.querySelector("#removeOne");
-// const counterPlusElement = document.querySelector("#addOne");
-//
-// //au début, le compte est à 0
-// let count = 0;
-//
-// //j'affiche la valeur initiale
-// function updateTotal() {
-//   counterDisplayElement.innerHTML = count;
-// }
-// //si on clique, cela soustrait 1, seulement si le solde est inférieur à 1
-// counterMinusElement.addEventListener("click", () => {
-//   if (!count < 1) count--;
-//   console.log("-1 produit")
-//   //l'affichage évolue
-//   updateTotal();
-// });
-// //si on clique, cela ajoute 1, sans condition
-// counterPlusElement.addEventListener("click", () => {
-//   console.log("+1 produit")
-//   count++;
-//   //l'affichage évolue
-//   updateTotal();
-// });
-//
-// //l'affichage du total évolue :
-// // les changements sont affiché que les fonctions aie été utilisée ou non
-// updateTotal();
 
 
