@@ -99,6 +99,7 @@ async function createBasket() {
             name: product.name,
             imageUrl: product.imageUrl,
             price: product.price * parseInt(inputQuantity.value),
+            productPrice: product.price
         });
         console.log("condition 1 : ok")
     } else {
