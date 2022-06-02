@@ -1,10 +1,14 @@
 (async () => {
     //faire en sorte que l'adresse du serveur puisse être modifié automatiquement
-    loadConfig().then(config => {
-        getProducts(config).then(products => {
-            displayProducts(products);
-        })
-    });
+    try{
+        loadConfig().then(config => {
+            getProducts(config).then(products => {
+                displayProducts(products);
+            })
+        });
+    }catch{
+        console.log("le fetch de l'index ne marche pas")
+    }
 })();
 
 const result = document.querySelector("#items");

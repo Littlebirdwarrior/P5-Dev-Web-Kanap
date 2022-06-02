@@ -161,10 +161,10 @@ myForm.addEventListener("submit", async function (e) {
     let regexEmail = new RegExp(
         "^[\\w-\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
         "g");
-    let regexLastName = new RegExp("^[a-zA-Z.-]D", "g");
-    let regexFirstName = new RegExp("^[a-zA-Z.-]D", "g");
-    let regexCity = new RegExp("[\\w\\d]", "g");
-    let regexAddress = new RegExp("[\\w\\d ,]", "g");
+    let regexLastName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]{1,60}$", "g");
+    let regexFirstName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]{1,60}$", "g");
+    let regexCity = new RegExp("^[a-zA-ZÀ-ÿ, ]+(?:[\\s-][a-zA-Z]+)*$", "g");
+    let regexAddress = new RegExp("^[a-zA-ZÀ-ÿ0-9\\s,'-]*$", "g");
 
     e.preventDefault();
 
@@ -284,6 +284,8 @@ async function postOrder(body) {
             'Content-Type': 'application/json'
         })
     };
-    const response = await fetch('http://localhost:3000/api/products/order', options);
+    let config = await loadConfig()
+    const response = await fetch(config.host + '/api/products/order', options);
     return await response.json();
 }
+
