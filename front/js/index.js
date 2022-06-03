@@ -1,7 +1,19 @@
+
+//Fetch de l'API
+
+/*
+* Cette fonction permet de n'écrire l'adresse du serveur une seule fois dans le service.js,
+* dans le fichier "service.js". Elle pourra ainsi être modifié automatiquement (voir service.js)
+* La fonction loadConfig() donne la variable config = résultat du fetch de l'API
+* */
+
+//l'asynchrone permet à au js de ne pas planter en attendant la promise
 (async () => {
-    //faire en sorte que l'adresse du serveur puisse être modifié automatiquement
+    //le try catch permet d'afficher un message personnalisé dans la console
     try{
+        //soit config le resulat de load config
         loadConfig().then(config => {
+            //config permet l'execution de getProducts() et displayProducts()
             getProducts(config).then(products => {
                 displayProducts(products);
             })
@@ -26,7 +38,7 @@ async function getProducts(config) {
 
 // Afficher les produits
 function displayProducts(products) {
-
+//Si products existe, alors il s'affiche dans le DOM
     if (products) {
         console.log("products called");
         result.innerHTML = products.map((product) => {
@@ -43,6 +55,7 @@ function displayProducts(products) {
             .join("");
 
     } else {
+        //sinon, la console renvois une erreur
         console.error("products not found")
     }
 }
