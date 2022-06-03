@@ -1,6 +1,15 @@
-//mon fetch du produit cliqué sur la home
+/* Consignes: Récupérer l’id du produit à afficher
+* Utiliser url.searchParams.get
+* Insérer un produit et ses détails dans la page Produit
+* Récupérer les informations du produit depuis le back
+* Afficher le produit selectionné, avec sa quantité et sa couleur.
+* Rendre la quantité et la couleur modifiable.
+* Envoyez le tout dans LS.
+* */
+
+//mon fetch du produit cliqué sur l'index (voir service.js)
+
 (async () => {
-    //faire en sorte que l'adresse du serveur puisse être modifié automatiquement
     try {
         getOneProduct().then(products => {
             displayProducts(products);
@@ -13,14 +22,15 @@
 ////////////////////////////
 // Afficher le produits
 
-//j'établis mes constantes
+//j'établis mes constantes (pour sélectionner les élèments HTML)
 const button = document.querySelector("button");
 const result = document.querySelector(".item");
 
-//je crée ma fonction
+//je crée ma fonction pour afficher les produits
 function displayProducts(product) {
     console.log("products called");
     if (product) {
+        //j'injecte mon code dans le DOM
         result.innerHTML =
             `<article>
             <div class="item__img">
@@ -68,31 +78,40 @@ function displayProducts(product) {
 }
 
 ///////////
+// Créer mon panier
 
-//LE PANIER --> Basket
-//je dois créer un local storage ou seront rangé les products choisis par l'utilisateur
+/* Je dois créer un local storage où seront rangé les products choisis par l'utilisateur
+* Mon panier dans le Local Storage est associé à la clé "basket",
+**/
+
 
 // Création du localStorage
 async function createBasket() {
+    //les données dont j'ai besoin dans mon Local Storage
     const inputQuantity = document.querySelector("#quantity");
+    const selectedColor = document.querySelector("select");
+    //mon fetch est ici, voir service.js
     const product = await getOneProduct();
     console.log("createBasket", product)
-    const selectedColor = document.querySelector("select");
 
+    //basket est le résultat de la fonction GET basket
     let basket = getBasket();
-    //Je définis la variable foundProduct, qui est un produit dans basket dont l'id
-    // ET la couleur est égal au produit demandé
-    //cela sert à ne pas ajouter 2 fois la même requête (cela s'appelle un prédicat)
-    //pour la couleur, c'est compliqué car il faut comparer des strings (et non des nombres),
-    // la méthode localeCompare permet de dire si A=B égal 0 équivault à A=B ou si A=B=1 équivaut à A!=B
+
+    //Je définis la variable foundProduct, qui est un produit dans basket dont l'id ET la couleur est égal au produit demandé
     let foundProduct = basket.find(p => p.id.localeCompare(product._id) === 0 && p.color.localeCompare(selectedColor.value) === 0);
+    /*
+    * cela sert à ne pas ajouter 2 fois la même requête (cela s'appelle un prédicat)
+    * pour la couleur, c'est compliqué car il faut comparer des strings (et non des nombres),
+    * la méthode localeCompare permet de dire si A=B égal 0 equivaut à A=B ou si A=B=1 équivaut à A!=B
+    * */
     console.log(basket, foundProduct);
     //si c'est l'inverse de foundProduct
     if (!foundProduct) {
-        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier
+        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket)
         basket.push({
-            id: product._id,
-            //parseInt, comme le parseFloat, transforme un string en nombre entier
+            id: product._id, //attention à l'orthographe du _id
+            /*parseInt, comme le parseFloat, transforme un string en nombre entier
+            important car la quantité reçue en input est une string*/
             quantity: parseInt(inputQuantity.value),
             description: product.description,
             color: selectedColor.value,
@@ -101,12 +120,12 @@ async function createBasket() {
             price: product.price * parseInt(inputQuantity.value),
             productPrice: product.price
         });
-        console.log("condition 1 : ok")
+        console.log("condition 1 : produit non ajouté, ok")
     } else {
         //condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
         foundProduct.quantity += parseInt(inputQuantity.value);
         foundProduct.price = product.price * foundProduct.quantity;
-        console.log("condition 2: ok")
+        console.log("condition 2: produit déjà ajouté, ok")
     }
     try {
         saveBasket(basket);
@@ -117,7 +136,7 @@ async function createBasket() {
 
 }
 
-//met des données dans le localstorage avec la clé basket
+//met des données en string dans le localstorage avec la clé basket
 function saveBasket(basket) {
     console.log("createBasket");
     localStorage.setItem("basket", JSON.stringify(basket));
@@ -129,10 +148,11 @@ function getBasket() {
     let basket = localStorage.getItem("basket");
     //on vérifie que l'on a récupéré quelque chose, si non, on fait un tableau vide,
     //c'est important, car cela permet de créer un tableau à remplir
+    //dire que basket peut être "undefined" ou nul permet de ne pas faire cracher le js
     if (!basket || basket === "undefined") {
         return [];
     } else {
-        // sinon, on créer un panier
+        // sinon, on créé un panier
         return JSON.parse(basket);
     }
 }

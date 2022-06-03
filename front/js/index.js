@@ -1,9 +1,16 @@
+/*
+Insérer les produits dans la page d’accueil
+* requêter l’API pour lui demander l’ensemble des produits ; récupérer la réponse émise.
+* parcourir celle-ci pour insérer chaque élément (chaque produit) dans la page d’accueil (dans le DOM).
+* */
 
+////////////////////
 //Fetch de l'API
 
 /*
 * Cette fonction permet de n'écrire l'adresse du serveur une seule fois dans le service.js,
 * dans le fichier "service.js". Elle pourra ainsi être modifié automatiquement (voir service.js)
+* * NB! : le <script>js/script.js</script> doit être rajouté à chaque page html,
 * La fonction loadConfig() donne la variable config = résultat du fetch de l'API
 * */
 
@@ -25,7 +32,7 @@
 
 const result = document.querySelector("#items");
 
-
+////////////////////
 // Récupérer les produits de l'API
 async function getProducts(config) {
     console.log("calling");
