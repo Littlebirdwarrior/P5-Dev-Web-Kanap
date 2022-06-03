@@ -178,7 +178,6 @@ myForm.addEventListener("submit", async function (e) {
     } else if (regexEmail.test(myEmail.value) === false) {
         let myError = document.getElementById('emailErrorMsg');
         myError.innerHTML = "Votre adresse mail est invalide";
-        myError.style.color = 'red';
         error = true;
     } else {
         let myError = document.getElementById('emailErrorMsg');
