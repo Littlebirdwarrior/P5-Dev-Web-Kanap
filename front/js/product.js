@@ -152,7 +152,7 @@ function getBasket() {
     if (!basket || basket === "undefined") {
         return [];
     } else {
-        // sinon, on créé un panier
+        // sinon, on créé un panier en chaîne de caractère
         return JSON.parse(basket);
     }
 }

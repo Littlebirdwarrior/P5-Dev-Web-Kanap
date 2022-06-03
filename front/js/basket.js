@@ -1,4 +1,8 @@
-//Je récupère les données de mon localStorage
+
+
+/////////////////////
+//------------------------Récupérer les données et les réenvoyé------------------//
+//Je récupère les données de mon localStorage (mon fetch)
 try {
     const basketContent = getBasket();
     console.log(basketContent)
@@ -6,7 +10,7 @@ try {
 } catch (error) {
     console.log("basket is not load from LS", error)
 }
-
+//je lance mon reload de la page
 displayTotalPrice();
 
 //remet des données dans le localstorage avec la clé basket
@@ -14,16 +18,19 @@ function saveBasket(basket) {
     console.log("saveBasket");
     localStorage.setItem("basket", JSON.stringify(basket));
 }
+///////////////////////
+//-----------------------Afficher le produit------------------//
+//NB: "result" permet de selectionner l'endroit ou l'innerHTML s'affiche
 
-// Afficher le produits
-//result permet de selectionner l'endroit ou l'innerHTML s'affiche
-
-//** imaginer une boucle qui le fait pour chaque éléments du panier
+/* imaginer une boucle qui génère du HTML pour chaque élément du panier:
+* */
 function displayBasket(basket) {
+    //mon console.log vérifie le basket en entrée
     console.log(basket);
     const result = document.querySelector(".cart__items");
     if (basket) {
         result.innerHTML +=
+            //le += permet d'ajouter les baskets les uns à la suite des autres
             ` <article class="cart__item" data-id="{product-ID}" data-color="{product-color}">
                 <div class="cart__item__img">
                   <img src="${basket.imageUrl}" alt="${basket.altTxt}">
@@ -53,7 +60,7 @@ function displayBasket(basket) {
     }
 }
 
-// ------------------------- Basket section -------------------------------//
+///////////////////////////
 //sur ce fichier, la fonction getBasket n'existe pas et si j'exécute product.js,
 //le fetch oneProduct est vide et crée une erreur, je dois donc le reproduire
 
@@ -68,31 +75,32 @@ function getBasket() {
     }
 }
 
-
-//Pour plus tard
+////////////////////
+//------------------------Changer les quantité du panier-------------------//
 //retirer un productInBasket du panier
-
 function removeFromBasket(id, color) {
     console.log("Removed from basket : ", id, color);
     let basket = getBasket();
+    //mon filtre laisse passer tous les élèment sauf celui cliqué
     basket = basket.filter(p => !(p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0));
     saveBasket(basket);
     document.location.reload();
 }
-
-// appeler avec le onblur
-// (dès que l'on clique ailleurs après avoir modifier le value, à la déselection)
+//Éditer le prix
+/* appeler avec le onblur
+ (dès que l'on clique ailleurs après avoir modifier le value, à la désélection)*/
 function editQuantityBasket(newQuantity, id, color) {
     let basket = getBasket();
+    //mon filtre ne laisse passer que l'élément choisi
     let foundProduct = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
     console.log("newQuantity", newQuantity)
     if (newQuantity) {
-        //
+        //Condition 1 : mon prix change, le multiplie le produit par la nouvelle quantité
         foundProduct.quantity = newQuantity;
         foundProduct.price = foundProduct.productPrice * foundProduct.quantity;
         console.log("nouveau prix", foundProduct);
     } else {
-        //
+        //Condition 2 : mon prix ne change pas, la quantité égale 1
         foundProduct.quantity = 1;
         foundProduct.price = foundProduct.productPrice;
         console.log("prix 1", foundProduct);
@@ -103,7 +111,7 @@ function editQuantityBasket(newQuantity, id, color) {
 }
 
 // selectionner avec le enter, il n'y a pas d'évenement spécifique pour ça
-// on en crée un sur l'element enter
+// on en crée un évènement sur l'element enter
 function onEnter(key, newQuantity, id, color) {
     // il ne se passe rien tant que le key n'est pas ce que je veux
     if (key === "Enter") {
@@ -112,7 +120,7 @@ function onEnter(key, newQuantity, id, color) {
 }
 
 
-// calculer la quantité
+// Calculer la quantité
 function getNumberProduct() {
     let basket = getBasket();
     let number = 0;
@@ -122,6 +130,7 @@ function getNumberProduct() {
     return number;
 }
 
+//Calculer le le total
 function getTotalPrice() {
     let basket = getBasket();
     let total = 0;
@@ -132,6 +141,7 @@ function getTotalPrice() {
     return total;
 }
 
+//Afficher  total
 function displayTotalPrice() {
     const result = document.querySelector(".cart__price");
     result.innerHTML +=
@@ -142,8 +152,8 @@ function displayTotalPrice() {
             </p> 
         `
 }
-
-//form
+////////////////////////
+//Le formulaire
 
 // Accédez à l'élément form …
 let myForm = document.getElementById("cart__order__form");
