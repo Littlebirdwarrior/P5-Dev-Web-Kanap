@@ -25,6 +25,10 @@ async function getOneProduct() {
         );
         console.log("answer");
         return await response.json();
+        //autre grammaire, au cas où on ne veut pas d'asynchrone :
+        // response.json().then(result => {
+        //     return result
+        // });
     } else {
         console.error("id not found")
     }
