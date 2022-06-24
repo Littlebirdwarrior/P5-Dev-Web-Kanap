@@ -231,7 +231,7 @@ myForm.addEventListener("submit", async function (e) {
         error = true;
     } else if (regexCity.test(myCity.value) === false) {
         let myError = document.getElementById('cityErrorMsg');
-        myError.innerHTML = "Votre prénom contient un caractère défendu";
+        myError.innerHTML = "Le nom de votre ville est à taper en toutes lettres";
         error = true;
     } else {
         let myError = document.getElementById('cityErrorMsg');
@@ -245,7 +245,7 @@ myForm.addEventListener("submit", async function (e) {
         error = true;
     } else if (regexAddress.test(myAddress.value) === false) {
         let myError = document.getElementById('addressErrorMsg');
-        myError.innerHTML = "Votre prénom contient un caractère défendu";
+        myError.innerHTML = "Votre adresse contient un caractère défendu";
         error = true;
     } else {
         let myError = document.getElementById('addressErrorMsg');
