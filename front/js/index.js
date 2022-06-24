@@ -1,11 +1,11 @@
 /*
-Insérer les produits dans la page d’accueil
+Consigne : Insérer les produits dans la page d’accueil
 * requêter l’API pour lui demander l’ensemble des produits ; récupérer la réponse émise.
 * parcourir celle-ci pour insérer chaque élément (chaque produit) dans la page d’accueil (dans le DOM).
 * */
 
 ////////////////////
-//Fetch de l'API
+//------------------------Fetch de l'API-------------------//
 
 /*
 * Cette fonction permet de n'écrire l'adresse du serveur une seule fois dans le service.js,
@@ -14,7 +14,6 @@ Insérer les produits dans la page d’accueil
 * La fonction loadConfig() donne la variable config = résultat du fetch de l'API
 * */
 
-//l'asynchrone permet à au js de ne pas planter en attendant la promise
 (async () => {
     //le try catch permet d'afficher un message personnalisé dans la console
     try{
@@ -33,22 +32,28 @@ Insérer les produits dans la page d’accueil
 const result = document.querySelector("#items");
 
 ////////////////////
-// Récupérer les produits de l'API
+//------------------------Afficher les produits en dynamiques-------------------//
+
+//Récupérer les produits de l'API
 async function getProducts(config) {
     console.log("calling");
+    //j'indique l'adresse de l'api
     const response = await fetch(
         config.host + "/api/products/"
     );
     console.log("answer");
+    //je lui demande de retourner en json
     return await response.json();
 }
 
 // Afficher les produits
 function displayProducts(products) {
-//Si products existe, alors il s'affiche dans le DOM
+//condition : Si products existe, alors il s'affiche dans le DOM
     if (products) {
         console.log("products called");
+        //la fonction .map() crée un tableau à partir de l’appel d’une fonction spécifique sur chaque élément du tableau parent
         result.innerHTML = products.map((product) => {
+            //L'instruction return met fin à l'exécution d'une fonction et définit une valeur à renvoyer à la fonction appelante.
             return `
     <a href="./product.html?id=${product._id}">
     <article>
@@ -59,6 +64,7 @@ function displayProducts(products) {
   </a>
     `;
         })
+            //La méthode join() crée et renvoie une nouvelle chaîne de caractères en concaténant tous les éléments d'un tableau
             .join("");
 
     } else {

@@ -7,6 +7,7 @@
 * Envoyez le tout dans LS.
 * */
 
+////////////////
 //mon fetch du produit cliqué sur l'index (voir service.js)
 
 (async () => {
@@ -31,6 +32,7 @@ function displayProducts(product) {
     console.log("products called");
     if (product) {
         //j'injecte mon code dans le DOM
+        //la fonction element.onclick permet de déclencher un évènement au click
         result.innerHTML =
             `<article>
             <div class="item__img">
@@ -80,9 +82,8 @@ function displayProducts(product) {
 ///////////
 // Créer mon panier
 
-/* Je dois créer un local storage où seront rangé les products choisis par l'utilisateur
-* Mon panier dans le Local Storage est associé à la clé "basket",
-**/
+/* Je dois créer un local storage où seront rangé les products choisis par l'utilisateur,
+* mon panier dans le Local Storage est associé à la clé "basket"*/
 
 
 // Création du localStorage
@@ -107,7 +108,7 @@ async function createBasket() {
     console.log(basket, foundProduct);
     //si c'est l'inverse de foundProduct
     if (!foundProduct) {
-        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket)
+        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket) avec .push()
         basket.push({
             id: product._id, //attention à l'orthographe du _id
             /*parseInt, comme le parseFloat, transforme un string en nombre entier
@@ -122,11 +123,13 @@ async function createBasket() {
         });
         console.log("condition 1 : produit non ajouté, ok")
     } else {
-        //condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
+        /*condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
+        * La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée.*/
         foundProduct.quantity += parseInt(inputQuantity.value);
         foundProduct.price = product.price * foundProduct.quantity;
         console.log("condition 2: produit déjà ajouté, ok")
     }
+    // un try catch permet d'identifier facilement l'erreur dans la console
     try {
         saveBasket(basket);
         console.log("basket is saved in LS")
@@ -146,13 +149,15 @@ function saveBasket(basket) {
 function getBasket() {
     //je crée une variable appelé 'basket' avec le contenu du localstorage à la clé 'basket'
     let basket = localStorage.getItem("basket");
-    //on vérifie que l'on a récupéré quelque chose, si non, on fait un tableau vide,
-    //c'est important, car cela permet de créer un tableau à remplir
     //dire que basket peut être "undefined" ou nul permet de ne pas faire cracher le js
     if (!basket || basket === "undefined") {
+        /*on vérifie que l'on a récupéré quelque chose, si non, on fait un tableau vide,
+        c'est important, car cela permet de créer un tableau à remplir*/
         return [];
     } else {
-        // sinon, on créé un panier en chaîne de caractère
+        /* sinon, on créé un panier en chaîne de caractère avec la méthode .parse() :
+        * La méthode JSON.parse() analyse une chaîne de caractères JSON et construit
+        * la valeur JavaScript ou l'objet décrit par cette chaîne.*/
         return JSON.parse(basket);
     }
 }
