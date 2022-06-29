@@ -7,9 +7,10 @@ gérer la modification et la suppression des produits dans le panier, passer la 
 //------------------------Récupérer les données et les réenvoyé------------------//
 //Je récupère les données de mon localStorage (mon fetch)
 try {
-    const basketContent = getBasket();
-    console.log(basketContent)
-    basketContent.forEach(p => displayBasket(p))
+    getBasket().then(basketContent => {
+        console.log(basketContent)
+        basketContent.forEach(p => displayBasket(p))
+    }); //ne charge que l'id, la quantité et la couleur
 } catch (error) {
     console.log("basket is not load from LS", error)
 }
@@ -68,7 +69,7 @@ function displayBasket(basket) {
 /*sur ce fichier, la fonction getBasket n'existe pas et si j'exécute product.js,
 le fetch oneProduct est vide et crée une erreur, je dois donc le reproduire*/
 
-function getBasket() {
+function getBasketFromStorage() {
     //je crée une variable appelé 'basket' avec le contenu du localstorage à la clé 'basket'
     let basket = localStorage.getItem("basket");
     //on vérifie que l'on a récupéré quelque chose, si non, on fait un tableau vide, sinon, on a créé un panier
@@ -78,37 +79,57 @@ function getBasket() {
         return JSON.parse(basket);
     }
 }
+// j'ai essayé de faire un map mais ne marche pas car on manipule des promises
+async function getBasket() {
+    let partialBasket = getBasketFromStorage();
+    let fullBasket = [];
+    for (let basketItem of partialBasket) {
+        let product = await getOneProduct(basketItem.id);
+        fullBasket.push({
+            id: product._id, //attention à l'orthographe du _id
+            quantity: basketItem.quantity,
+            description: product.description,
+            color: basketItem.color,
+            name: product.name,
+            imageUrl: product.imageUrl,
+            price: product.price * basketItem.quantity,
+            productPrice: product.price
+        }) ;
+    }
+    return fullBasket
+}
 
 ////////////////////
 //------------------------Changer les quantité du panier-------------------//
 //retirer un productInBasket du panier
 function removeFromBasket(id, color) {
     console.log("Removed from basket : ", id, color);
-    let basket = getBasket();
+    let basket = getBasketFromStorage();
     //mon filtre laisse passer tous les élèments sauf celui cliqué
     basket = basket.filter(p => !(p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0));
     saveBasket(basket);
     document.location.reload();
 }
 
-//Éditer le prix
+//Éditer la quantité
 /* appeler avec le onblur
  (dès que l'on clique ailleurs après avoir modifier le value, à la désélection)*/
 function editQuantityBasket(newQuantity, id, color) {
-    let basket = getBasket();
+    let basket = getBasketFromStorage();
     //mon filtre ne laisse passer que l'élément choisi
-    let foundProduct = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
+    let basketItem = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
     console.log("newQuantity", newQuantity)
-    if (newQuantity) {
-        //Condition 1 : mon prix change, le multiplie le produit par la nouvelle quantité
-        foundProduct.quantity = newQuantity;
-        foundProduct.price = foundProduct.productPrice * foundProduct.quantity;
-        console.log("nouveau prix", foundProduct);
+    if (newQuantity && newQuantity > 0) {
+        //Condition 1 : ma quantité change, le multiplie le produit par la nouvelle quantité
+        basketItem.quantity = newQuantity;
+        console.log("nouveau prix", basketItem);
+        //Condition 2 : ma quantité est égale à 0, je supprime le produit
+    } else if (newQuantity && newQuantity === 0) {
+        removeFromBasket(id, color)
     } else {
-        //Condition 2 : mon prix ne change pas, la quantité égale 1
-        foundProduct.quantity = 1;
-        foundProduct.price = foundProduct.productPrice;
-        console.log("prix 1", foundProduct);
+        //Condition 2 : ma quantité ne change pas, la quantité égale 1
+        basketItem.quantity = 1;
+        console.log("prix 1", basketItem);
     }
     saveBasket(basket);
     document.location.reload();
@@ -125,9 +146,9 @@ function onEnter(key, newQuantity, id, color) {
 }
 
 
-// Calculer la quantité
+// Calculer la quantité si changement
 function getNumberProduct() {
-    let basket = getBasket();
+    let basket = getBasket().then();
     let number = 0;
     for (let basketElement of basket) {
         number += basketElement.quantity;
@@ -137,7 +158,7 @@ function getNumberProduct() {
 
 //Calculer le le total
 function getTotalPrice() {
-    let basket = getBasket();
+    let basket = getBasket().then();
     let total = 0;
     for (let basketElement of basket) {
         total += basketElement.price;

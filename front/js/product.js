@@ -12,8 +12,8 @@
 
 (async () => {
     try {
-        getOneProduct().then(products => {
-            displayProducts(products);
+        getOneProduct(urlProductId).then(product => {
+            displayProduct(product);
         });
     } catch {
         console.log("le fetch du product ne marche pas")
@@ -28,7 +28,7 @@ const button = document.querySelector("button");
 const result = document.querySelector(".item");
 
 //je crée ma fonction pour afficher les produits
-function displayProducts(product) {
+function displayProduct(product) {
     console.log("products called");
     if (product) {
         //j'injecte mon code dans le DOM
@@ -85,35 +85,18 @@ function displayProducts(product) {
 /* Je dois créer un local storage où seront rangé les products choisis par l'utilisateur,
 * mon panier dans le Local Storage est associé à la clé "basket"*/
 
-//je ne veux pas sauvegarder une valeur négative
-
-function forcePositiveQuantity() {
-    //je récupère ma quantité
-    const inputQuantity = document.querySelector("#quantity");
-    //je crée ma variable à comparer
-    let quantity = parseInt(inputQuantity.value);
-    if (quantity>0) {
-        return quantity;
-    } else {
-        return 0 //si la quantité est négative, j'ajoute 0
-    }
-}
-
-
 
 // Création du localStorage
 async function createBasket() {
     //les données dont j'ai besoin dans mon Local Storage
     const inputQuantity = document.querySelector("#quantity");
     const selectedColor = document.querySelector("select");
-    //mon fetch est ici, voir service.js
-    const product = await getOneProduct();
 
     //basket est le résultat de la fonction GET basket
     let basket = getBasket();
 
     //Je définis la variable foundProduct, qui est un produit dans basket dont l'id ET la couleur est égal au produit demandé
-    let foundProduct = basket.find(p => p.id.localeCompare(product._id) === 0 && p.color.localeCompare(selectedColor.value) === 0);
+    let foundProduct = basket.find(p => p.id.localeCompare(urlProductId) === 0 && p.color.localeCompare(selectedColor.value) === 0);
     /*
     * cela sert à ne pas ajouter 2 fois la même requête (cela s'appelle un prédicat)
     * pour la couleur, c'est compliqué car il faut comparer des strings (et non des nombres),
@@ -122,24 +105,23 @@ async function createBasket() {
     console.log(basket, foundProduct);
 
     //si c'est l'inverse de foundProduct
-    let  quantity = parseInt(inputQuantity.value);
-    if (quantity<=0) {
+    let positiveQuantity = parseInt(inputQuantity.value);
+    if (positiveQuantity <= 0) {
         console.log('la quantité est négative')
     } else if (!foundProduct) {
         //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket) avec .push()
         basket.push({
-            id: product._id, //attention à l'orthographe du _id
+            id: urlProductId, //attention à l'orthographe du _id
             /*parseInt, comme le parseFloat, transforme un string en nombre entier
             important car la quantité reçue en input est une string*/
-            quantity: parseInt(inputQuantity.value), //remplacer par une fonction qui vérifie que la valeur est pas négative
+            quantity: positiveQuantity, //remplacer par une fonction qui vérifie que la valeur est pas négative
             color: selectedColor.value,
         });
         console.log("condition 1 : produit non ajouté, ok")
     } else {
         /*condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
         * La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée.*/
-        foundProduct.quantity += forcePositiveQuantity();
-        foundProduct.price = product.price * foundProduct.quantity;
+        foundProduct.quantity += positiveQuantity;
         console.log("condition 2: produit déjà ajouté, ok")
     }
     // un try catch permet d'identifier facilement l'erreur dans la console

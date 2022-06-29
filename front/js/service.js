@@ -8,7 +8,7 @@
 * */
 
 // Récupérer l'id dans l'URL (qui est stocké dans l'API)
-const productId = new URL(location.href).searchParams.get("id");
+const urlProductId = new URL(location.href).searchParams.get("id");
 
 /*La déclaration async function définit une fonction asynchrone :
 une fonction qui s'exécute de façon asynchrone grâce à la boucle d'évènement en utilisant
@@ -17,7 +17,7 @@ la méthode .then() renvoie la promise et bloque l'asynchrone. La méthode await
 
 
 // Récupérer un produit dans le panier (productInBasket) de l'API avec l'id
-async function getOneProduct() {
+async function getOneProduct(productId) {
     let config = await loadConfig();
     if (productId) {
         const response = await fetch(
