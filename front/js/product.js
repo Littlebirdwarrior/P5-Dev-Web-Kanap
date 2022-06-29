@@ -113,7 +113,7 @@ async function createBasket() {
             id: product._id, //attention à l'orthographe du _id
             /*parseInt, comme le parseFloat, transforme un string en nombre entier
             important car la quantité reçue en input est une string*/
-            quantity: parseInt(inputQuantity.value),
+            quantity: parseInt(inputQuantity.value), //remplacer par une fonction qui vérifie que la valeur est pas négative
             description: product.description,
             color: selectedColor.value,
             name: product.name,

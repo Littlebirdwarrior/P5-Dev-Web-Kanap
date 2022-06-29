@@ -21,6 +21,7 @@ function saveBasket(basket) {
     console.log("saveBasket");
     localStorage.setItem("basket", JSON.stringify(basket));
 }
+
 ///////////////////////
 //-----------------------Afficher le produit------------------//
 
@@ -47,7 +48,9 @@ function displayBasket(basket) {
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input onblur="editQuantityBasket(value, '${basket.id}', '${basket.color}')" onkeydown="onEnter(event.key, value, '${basket.id}', '${basket.color}')" type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket.quantity}">
+                      <input onblur="editQuantityBasket(value, '${basket.id}', '${basket.color}')" 
+                      onkeydown="onEnter(event.key, value, '${basket.id}', '${basket.color}')" 
+                      type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${basket.quantity}">
                     </div>
                     <div class="cart__item__content__settings__delete">
                       <button onclick="removeFromBasket('${basket.id}', '${basket.color}')">Supprimer</button>
@@ -87,6 +90,7 @@ function removeFromBasket(id, color) {
     saveBasket(basket);
     document.location.reload();
 }
+
 //Éditer le prix
 /* appeler avec le onblur
  (dès que l'on clique ailleurs après avoir modifier le value, à la désélection)*/
@@ -153,6 +157,7 @@ function displayTotalPrice() {
             </p> 
         `
 }
+
 ////////////////////////
 //------------------------Le Formulaire-------------------//
 
@@ -170,10 +175,10 @@ myForm.addEventListener("submit", async function (e) {
 
     // mes regexs : les règles qui valident mes conditions
     let regexEmail = new RegExp(
-        "^[\\w-\.]+@([\\w-]+\\.)+[\\w-]{2,4}$",
-        "g");// format xxx@xxx.xx requis
-    let regexLastName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]{1,60}$", "g"); // n'admet que l'alphabet en minuscule/majuscule et les accents
-    let regexFirstName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]{1,60}$", "g");// n'admet que l'alphabet en minuscule/majuscule et les accents
+        "^[\\w-\.]+@{1,64}(([\\w-]+\\.){1,64})+[\\w-]{2,4}$",
+        "g");// format xxx@xxx.xx requis (65 ch pour les x) //je me base sur ce site https://www.mindbaz.com/technologie-email/quelle-est-la-taille-maximale-d-une-adresse-mail/
+    let regexLastName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]*$", "g"); // n'admet que l'alphabet en minuscule/majuscule et les accents
+    let regexFirstName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]*$", "g");// n'admet que l'alphabet en minuscule/majuscule et les accents
     let regexCity = new RegExp("^[a-zA-ZÀ-ÿ, ]+(?:[\\s-][a-zA-Z]+)*$", "g");// pas de chiffre ou de caractères spéciaux admis sauf , et espaces
     let regexAddress = new RegExp("^[a-zA-ZÀ-ÿ0-9\\s,'-]*$", "g");// pas de caractères spéciaux admis sauf ,'-
 
@@ -187,9 +192,15 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
+    } else if (myEmail.value.length > 320) {
+        let myError = document.getElementById('emailErrorMsg');
+        myError.innerHTML = "Ce champ doit faire moins de 320 caractère";
+        myError.style.color = '#fbbcbc';
+        error = true;
     } else if (regexEmail.test(myEmail.value) === false) {
         let myError = document.getElementById('emailErrorMsg');
         myError.innerHTML = "Votre adresse mail est invalide";
+        myError.style.color = '#fbbcbc';
         error = true;
     } else {
         let myError = document.getElementById('emailErrorMsg');
@@ -201,9 +212,15 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
+    } else if (myFirstName.value.length > 25) {
+        let myError = document.getElementById('firstNameErrorMsg');
+        myError.innerHTML = "Ce champ doit faire moins de 25 caractère";
+        myError.style.color = '#fbbcbc';
+        error = true;
     } else if (regexFirstName.test(myFirstName.value) === false) {
         let myError = document.getElementById('firstNameErrorMsg');
         myError.innerHTML = "Votre prénom contient un caractère défendu";
+        myError.style.color = '#fbbcbc';
         error = true;
     } else {
         let myError = document.getElementById('firstNameErrorMsg');
@@ -215,9 +232,15 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
+    } else if (myLastName.value.length > 25) {
+        let myError = document.getElementById('lastNameErrorMsg');
+        myError.innerHTML = "Ce champ doit faire moins de 25 caractère";
+        myError.style.color = '#fbbcbc';
+        error = true;
     } else if (regexLastName.test(myLastName.value) === false) {
         let myError = document.getElementById('lastNameErrorMsg');
         myError.innerHTML = "Votre nom contient un caractère défendu";
+        myError.style.color = '#fbbcbc';
         error = true;
     } else {
         let myError = document.getElementById('lastNameErrorMsg');
@@ -229,9 +252,15 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
+    } else if (myCity.value.length > 58) { //le plus grand nom homologué est au Pays de Galle et à 58 lettres
+        let myError = document.getElementById('cityErrorMsg');
+        myError.innerHTML = "Ce champ doit faire moins de 58 caractère";
+        myError.style.color = '#fbbcbc';
+        error = true;
     } else if (regexCity.test(myCity.value) === false) {
         let myError = document.getElementById('cityErrorMsg');
         myError.innerHTML = "Le nom de votre ville est à taper en toutes lettres";
+        myError.style.color = '#fbbcbc';
         error = true;
     } else {
         let myError = document.getElementById('cityErrorMsg');
@@ -243,9 +272,15 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
+    } else if (myAddress.value.length > 85) {
+        let myError = document.getElementById('addressErrorMsg');
+        myError.innerHTML = "Ce champ doit faire moins de 85 caractère";
+        myError.style.color = '#fbbcbc';
+        error = true;
     } else if (regexAddress.test(myAddress.value) === false) {
         let myError = document.getElementById('addressErrorMsg');
         myError.innerHTML = "Votre adresse contient un caractère défendu";
+        myError.style.color = '#fbbcbc';
         error = true;
     } else {
         let myError = document.getElementById('addressErrorMsg');
