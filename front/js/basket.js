@@ -6,6 +6,8 @@ gérer la modification et la suppression des produits dans le panier, passer la 
 /////////////////////
 //------------------------Récupérer les données et les réenvoyé------------------//
 //Je récupère les données de mon localStorage (mon fetch)
+/*Pour que le prix ne soit pas éditable dans la console,
+* je ne récupére que l'ID, la quantité et la couleur*/
 try {
     getBasket().then(basketContent => {
         console.log(basketContent)
@@ -79,6 +81,10 @@ function getBasketFromStorage() {
         return JSON.parse(basket);
     }
 }
+
+/*Ici, j'ajoute dans mon basket les infos qui me manque pour l'affichage
+* je retourne les chercher dans le back
+* attention, je manipule des promises, donc ma fonction get basket est asynchrone*/
 // j'ai essayé de faire un map mais ne marche pas car on manipule des promises
 async function getBasket() {
     let partialBasket = getBasketFromStorage();
@@ -118,18 +124,18 @@ function editQuantityBasket(newQuantity, id, color) {
     let basket = getBasketFromStorage();
     //mon filtre ne laisse passer que l'élément choisi
     let basketItem = basket.find(p => p.id.localeCompare(id) === 0 && p.color.localeCompare(color) === 0);
-    console.log("newQuantity", newQuantity)
+    console.log("ma quantité de base", newQuantity)
     if (newQuantity && newQuantity > 0) {
         //Condition 1 : ma quantité change, le multiplie le produit par la nouvelle quantité
         basketItem.quantity = parseInt(newQuantity);
-        console.log("nouveau prix", newQuantity )
+        console.log("nouvelle quantité", newQuantity )
         //Condition 2 : ma quantité est égale à 0, je supprime le produit
     } else if (newQuantity && newQuantity === 0) {
         removeFromBasket(id, color)
     } else {
         //Condition 3 : ma quantité ne change pas, la quantité égale 1
         basketItem.quantity = 1;
-        console.log("prix 1", basketItem);
+        console.log("quantité de 1", basketItem);
     }
     saveBasket(basket);
     document.location.reload();
@@ -161,6 +167,7 @@ function getNumberProduct() {
 }
 
 //Calculer le le total
+//idem, asynchronous
 function getTotalPrice() {
     return getBasket().then(basket => {
         let total = 0;
@@ -175,7 +182,7 @@ function getTotalPrice() {
 //Afficher  total
 
 async function displayTotalPrice() {
-
+//idem, asynchronous
     const result = document.querySelector(".cart__price");
     result.innerHTML +=
         `<p>Total (
@@ -204,10 +211,10 @@ myForm.addEventListener("submit", async function (e) {
     // mes regexs : les règles qui valident mes conditions
     let regexEmail = new RegExp(
         "^[\\w-\.]+@{1,64}(([\\w-]+\\.){1,64})+[\\w-]{2,4}$",
-        "g");// format xxx@xxx.xx requis (65 ch pour les x) //je me base sur ce site https://www.mindbaz.com/technologie-email/quelle-est-la-taille-maximale-d-une-adresse-mail/
+        "g");// format xxx@xxx.xx requis (64 ch pour les x) //je me base sur ce site https://www.mindbaz.com/technologie-email/quelle-est-la-taille-maximale-d-une-adresse-mail/
     let regexLastName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]*$", "g"); // n'admet que l'alphabet en minuscule/majuscule et les accents
     let regexFirstName = new RegExp("^[a-zA-Zàâéèëêïîôùüç -]*$", "g");// n'admet que l'alphabet en minuscule/majuscule et les accents
-    let regexCity = new RegExp("^[a-zA-ZÀ-ÿ, ]+(?:[\\s-][a-zA-Z]+)*$", "g");// pas de chiffre ou de caractères spéciaux admis sauf , et espaces
+    let regexCity = new RegExp("^[a-zA-ZÀ-ÿ, ]+(?:[\\s-][a-zA-Z]+)*$", "g");// pas de chiffre ou de caractères spéciaux admis sauf, et espaces
     let regexAddress = new RegExp("^[a-zA-ZÀ-ÿ0-9\\s,'-]*$", "g");// pas de caractères spéciaux admis sauf ,'-
 
     e.preventDefault();
@@ -220,10 +227,10 @@ myForm.addEventListener("submit", async function (e) {
         myError.innerHTML = "Cet élément est requis";
         myError.style.color = 'orange';
         error = true;
-    } else if (myEmail.value.length > 320) {
+    } else if (myEmail.value.length > 320) { //le fait de l'ajouter comme cela et non dans la regex permet de personnalisez le message d'erreur
         let myError = document.getElementById('emailErrorMsg');
         myError.innerHTML = "Ce champ doit faire moins de 320 caractère";
-        myError.style.color = '#fbbcbc';
+        myError.style.color = '#fbbcbc'; //je dois rajouter le style car en cas de 1er erreur, la style orange reste
         error = true;
     } else if (regexEmail.test(myEmail.value) === false) {
         let myError = document.getElementById('emailErrorMsg');

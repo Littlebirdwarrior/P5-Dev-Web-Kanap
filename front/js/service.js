@@ -7,16 +7,16 @@
 * sinon loadConfig est "undefined".
 * */
 
-// Récupérer l'id dans l'URL (qui est stocké dans l'API)
+// Récupérer l'id dans l'URL (qui est stocké dans l'API) : en faire une constante pour le réutiliser partout
 const urlProductId = new URL(location.href).searchParams.get("id");
 
 /*La déclaration async function définit une fonction asynchrone :
 une fonction qui s'exécute de façon asynchrone grâce à la boucle d'évènement en utilisant
 une promesse (Promise) comme valeur de retour. L'asynchrone permet à au js de ne pas planter en attendant la promise,
-la méthode .then() renvoie la promise et bloque l'asynchrone. La méthode await fait a peu près la même chose */
+la méthode .then() renvoie la promise et bloque l'asynchrone. La méthode await fait à peu près la même chose */
 
 
-// Récupérer un produit dans le panier (productInBasket) de l'API avec l'id
+// Récupérer un produit dans le panier (productInBasket) de l'API sur le port 3000 avec l'id
 async function getOneProduct(productId) {
     let config = await loadConfig();
     if (productId) {

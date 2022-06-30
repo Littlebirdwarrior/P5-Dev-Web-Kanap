@@ -21,7 +21,7 @@
 })();
 
 ////////////////////////////
-// Afficher le produits
+//----------------------------- Afficher le produits----------------------//
 
 //j'établis mes constantes (pour sélectionner les élèments HTML)
 const button = document.querySelector("button");
@@ -80,7 +80,7 @@ function displayProduct(product) {
 }
 
 ///////////
-// Créer mon panier
+// -------------------------------Créer mon panier-----------------------------//
 
 /* Je dois créer un local storage où seront rangé les products choisis par l'utilisateur,
 * mon panier dans le Local Storage est associé à la clé "basket"*/
@@ -97,30 +97,22 @@ async function createBasket() {
 
     //Je définis la variable foundProduct, qui est un produit dans basket dont l'id ET la couleur est égal au produit demandé
     let foundProduct = basket.find(p => p.id.localeCompare(urlProductId) === 0 && p.color.localeCompare(selectedColor.value) === 0);
-    /*
-    * cela sert à ne pas ajouter 2 fois la même requête (cela s'appelle un prédicat)
-    * pour la couleur, c'est compliqué car il faut comparer des strings (et non des nombres),
-    * la méthode localeCompare permet de dire si A=B égal 0 equivaut à A=B ou si A=B=1 équivaut à A!=B
-    * */
-    console.log(basket, foundProduct);
 
-    //si c'est l'inverse de foundProduct
+    //je vérifie que la quantité rentré par l'utilisateur est positive
     let positiveQuantity = parseInt(inputQuantity.value);
     if (positiveQuantity <= 0) {
+        //condition 1 : si la quantité est négative, il ne se passe rien
         console.log('la quantité est négative')
-    } else if (!foundProduct) {
-        //condition 1: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket) avec .push()
+    } else if (!foundProduct) { //inverse de foundProduct
+        //condition 2: si le produit n'est pas déjà ajouté, je crée un nouveau panier (dans le tableau basket) avec .push()
         basket.push({
             id: urlProductId, //attention à l'orthographe du _id
-            /*parseInt, comme le parseFloat, transforme un string en nombre entier
-            important car la quantité reçue en input est une string*/
-            quantity: positiveQuantity, //remplacer par une fonction qui vérifie que la valeur est pas négative
+            quantity: positiveQuantity,
             color: selectedColor.value,
         });
         console.log("condition 1 : produit non ajouté, ok", positiveQuantity)
     } else {
-        /*condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
-        * La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée.*/
+        //condition 3: si le produit est deja ajouté, je récupère sa quantité sur la page
         foundProduct.quantity += positiveQuantity;
         console.log("condition 2: produit déjà ajouté, ok", positiveQuantity)
     }
