@@ -15,7 +15,7 @@ try {
     console.log("basket is not load from LS", error)
 }
 //je lance mon reload de la page
-displayTotalPrice();
+displayTotalPrice().then();
 
 //remet des données dans le localstorage avec la clé basket
 function saveBasket(basket) {
