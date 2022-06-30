@@ -117,12 +117,12 @@ async function createBasket() {
             quantity: positiveQuantity, //remplacer par une fonction qui vérifie que la valeur est pas négative
             color: selectedColor.value,
         });
-        console.log("condition 1 : produit non ajouté, ok")
+        console.log("condition 1 : produit non ajouté, ok", positiveQuantity)
     } else {
         /*condition 2: si le produit est deja ajouté, je récupère sa quantité sur la page
         * La fonction parseInt() analyse une chaîne de caractère fournie en argument et renvoie un entier exprimé dans une base donnée.*/
         foundProduct.quantity += positiveQuantity;
-        console.log("condition 2: produit déjà ajouté, ok")
+        console.log("condition 2: produit déjà ajouté, ok", positiveQuantity)
     }
     // un try catch permet d'identifier facilement l'erreur dans la console
     try {

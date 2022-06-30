@@ -121,13 +121,13 @@ function editQuantityBasket(newQuantity, id, color) {
     console.log("newQuantity", newQuantity)
     if (newQuantity && newQuantity > 0) {
         //Condition 1 : ma quantité change, le multiplie le produit par la nouvelle quantité
-        basketItem.quantity = newQuantity;
-        console.log("nouveau prix", basketItem);
+        basketItem.quantity = parseInt(newQuantity);
+        console.log("nouveau prix", newQuantity )
         //Condition 2 : ma quantité est égale à 0, je supprime le produit
     } else if (newQuantity && newQuantity === 0) {
         removeFromBasket(id, color)
     } else {
-        //Condition 2 : ma quantité ne change pas, la quantité égale 1
+        //Condition 3 : ma quantité ne change pas, la quantité égale 1
         basketItem.quantity = 1;
         console.log("prix 1", basketItem);
     }
@@ -148,33 +148,40 @@ function onEnter(key, newQuantity, id, color) {
 
 // Calculer la quantité si changement
 function getNumberProduct() {
-    let basket = getBasket().then();
-    let number = 0;
-    for (let basketElement of basket) {
-        number += basketElement.quantity;
-    }
-    return number;
+    //get basket étant devenu asynchrone,
+    // la promesse n'est pas itérable, il faut transformer la fonction pour recevoir la promesse
+    return getBasket().then(basket => {
+        let number = 0;
+        for (let basketElement of basket) {
+            number += basketElement.quantity;
+            console.log(number)
+        }
+        return number;
+    });
 }
 
 //Calculer le le total
 function getTotalPrice() {
-    let basket = getBasket().then();
-    let total = 0;
-    for (let basketElement of basket) {
-        total += basketElement.price;
-    }
-    console.log("total")
-    return total;
+    return getBasket().then(basket => {
+        let total = 0;
+        for (let basketElement of basket) {
+            total += basketElement.price;
+        }
+        return total;
+    });
 }
 
+
 //Afficher  total
-function displayTotalPrice() {
+
+async function displayTotalPrice() {
+
     const result = document.querySelector(".cart__price");
     result.innerHTML +=
         `<p>Total (
-            <span id="totalQuantity">${getNumberProduct()}
+            <span id="totalQuantity">${await getNumberProduct()}
             </span> articles) : 
-            <span id="totalPrice">${getTotalPrice()}</span> €
+            <span id="totalPrice">${ await getTotalPrice()}</span> €
             </p> 
         `
 }
